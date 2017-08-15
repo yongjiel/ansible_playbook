@@ -1,0 +1,10 @@
+---
+- hosts: centos_servers 
+  remote_user: centos
+  become: yes
+  tasks:
+    - name: make docker images
+      shell: docker build -t cfmid:latest /home/centos/cfmid
+    - name: test docker images
+      shell: docker run -i cfmid:latest echo hello
+ 
