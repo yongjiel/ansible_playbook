@@ -1,0 +1,59 @@
+---
+# for installation of docker-cd=e
+- name: uninstall docker first
+  yum: 
+    name: "{{ item }}"
+    state: absent
+  with_items:
+    - docker 
+    - docker-common
+    - docker-selinux
+    - docker-engine
+- name: clean up docker repos
+  file:
+    path: /etc/yum.repos.d/docker-ce.repo
+    state: absent
+- name: install dependancies
+  yum: 
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - yum-utils 
+    - device-mapper-persistent-data 
+    - lvm2
+- name: clean up unfinished transations
+  shell: yum-complete-transaction --cleanup-only
+- name: set up docker repository
+  shell: yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+- name: update package index
+  shell: yum makecache fast
+- name: install docker-ce
+  yum:
+    name: docker-ce
+    state: present
+- name: list docker versions
+  shell:  yum list docker-ce.x86_64  --showduplicates | sort -r
+- name: install specific version of docker-ce
+  yum: 
+    name: docker-ce-17.06.0.ce-1.el7.centos
+    state: installed
+- name: start dockerd
+  service: name=docker state=started enabled=yes
+- name: show docker version
+  shell: docker info
+- name: Add current user to group docker
+  shell: usermod -a -G docker centos
+- name: activate new group centos
+  shell: newgrp docker
+- name: install zip and unzip
+  yum:
+    name: "{{ item }}"
+    state: installed
+  with_items:
+    - zip
+    - unzip
+- name:  unarchive cfmid.zip to remote
+  unarchive:
+    src: /home/centos/cfmid.zip
+    dest: /home/centos
+...

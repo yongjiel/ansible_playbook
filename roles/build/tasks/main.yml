@@ -1,0 +1,7 @@
+---
+# for build docker image of cfm-id and test
+- name: make docker images
+  shell: docker build -t cfmid:latest /home/centos/cfm_id/cfmid
+- name: test docker images
+  shell: docker run -i cfmid:latest echo hello
+... 
